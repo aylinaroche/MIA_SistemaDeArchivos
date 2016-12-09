@@ -18,10 +18,11 @@
 void atributoDisco(char* coman);
 void crearDisco();
 int  crearArchivoBinario(char* size, char* path, char* nom);
-int multiploDeOcho(int tam);
+int  multiploDeOcho(int tam);
 void imprimirDatos();
 void limpiarVariables();
 void metodoPrueba();
+void mostrarMontadas();
 int  eliminarDisco();
 void adminParticion();
 int  crearParticion(char* path,char* name,char* size,char* unit,char* type,char* fit);

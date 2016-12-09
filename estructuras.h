@@ -73,31 +73,36 @@ typedef struct JOURNAL {
 } journal;
 
 typedef struct SUPERBLOQUE {
-	int fileSystemType; //sistema de archivos
-	int inodosCount; //
-	int bloquesCount; //
-	int bloquesLibresCount; //
-	int inodosLibresCount; //
-	time_t mtime; //
-	time_t umtime; ///
-	int mountCount; //
-	int magic; //
-	int inodoSize;//
-	int bloqueSize;//
-	int primerInodo; //
-	int primerBloque; //
-	int inicioBitInodo;//
-	int inicioBitBloque;//
-	int inicioTablaInodo;//
-	int inicioTablaBloque;//
-//17 datos
-	int apuntadorSuperBloque;
-	int apuntador;
-	int apuntadorJournal;
-	int apuntadorBitmap; //ad
-	int apuntadorBitmapCarpeta;
-	int apuntadorCarpeta;
-	int arbolContador;
+	char* nombre;
+	int arbolVirtualCount;
+	int detalleDirectorioCount;
+	int inodosCount;
+	int bloquesCount;
+	int freeArbolCount;
+	int freeDetalleDirectorioCount;
+	int freeBloquesCount;
+	int freeInodosCount;
+	time_t DateCreacion;
+	time_t DateMontaje;
+	int mountCount;
+	int apuntadorBitArbolDirectorio;
+	int apuntadorArbolDirectorio;
+	int apuntadorBitDetalleDirectorio; //Directorio = Carpeta
+	int apuntadorDetalleDirectorio;
+	int apuntadorBitTablaInodo;
+	int apuntadorTablaInodo;
+	int apuntadorBitBloques;
+	int apuntadorBloques;
+	int apuntadorLog;
+	int arbolDirectorioSize;
+	int detalleDirectorioSize;
+	int inodoSize;
+	int bloqueSize;
+	int firstFreeBitArbol;
+	int firstFreeBitDetalleDirectorio;
+	int firstFreeBitTablaInodo;
+	int firstFreeBitBloque;
+	int magic;
 } superbloque;
 
 typedef struct MONTAR { //Cola para realizar el mount

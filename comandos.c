@@ -180,10 +180,10 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		//   imprimirDatos();
-		//eliminarDisco();
+		eliminarDisco();
 
 	}
-	/*
+
 	else if (strcasecmp(com, "fdisk") == 0 || strcasecmp(com, "Fdisk") == 0
 			|| strcasecmp(com, "FDISK") == 0 || strcasecmp(com, "FDisk") == 0) {
 		//      printf("fdisk\n");
@@ -270,18 +270,26 @@ void verificarComando(char *com, char *atributos) {
 		char aux[100];
 		strcpy(aux, atributos);
 		inst = strtok(atributos, " ");
-		//  printf("inst = %s\n",inst);
+		int bool=0;
 		while (inst != NULL) {
 			inst = strtok(NULL, " ");
-			switch (cont) {
-			case 1:
-				com1 = inst;
-				break;
-			case 2:
-				com2 = inst;
-				break;
+
+		if(inst!=NULL){
+			if(strcmp(inst,"+") == 0){
+				mostrarMontadas();
+				bool = 1;
+			}else{
+				switch (cont) {
+				case 1:
+					com1 = inst;
+					break;
+				case 2:
+					com2 = inst;
+					break;
+				}
 			}
 			cont++;
+		}
 		}
 		int i;
 		for (i = 1; i < cont - 1; i++) {
@@ -291,10 +299,11 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com2);
 			}
 		}
-		//	 imprimirDatos();
-		// printf("m\n");
-		montarP();
-		metodoPrueba();
+
+		if(bool!=1){
+			montarP();
+			mostrarMontadas();
+		}
 
 	} else if (strcasecmp(com, "umount") == 0 || strcasecmp(com, "UMOUNT") == 0
 			|| strcasecmp(com, "UNmount") == 0) {
@@ -310,7 +319,7 @@ void verificarComando(char *com, char *atributos) {
 		strcpy(atributos, atr);
 		char aux[100];
 		strcpy(aux, atributos);
-		printf("atr = %s\n", atributos);
+		//printf("atr = %s\n", atributos);
 		inst = strtok(atr, " ");
 
 		// printf("inst1 =%s\n",inst);
@@ -415,11 +424,10 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		//    imprimirDatos();
-		generarReporte();
+		//generarReporte();
 
 	} else if (strcasecmp(com, "exec") == 0 || strcasecmp(com, "EXEC") == 0) {
 		// printf("exec\n");
-
 		char atr[200];
 		strcpy(atr, atributos);
 		int j;
@@ -448,11 +456,9 @@ void verificarComando(char *com, char *atributos) {
 			if (i == 1) {
 				//	  printf("a==%s\n",com1);
 				atributoDisco(com1);
-
 			}
 		}
-		//      imprimirDatos();
-			script();
+		script();
 
 	} else if (strcasecmp(com, "df") == 0) {
 		//   printf("disk free\n");
@@ -636,9 +642,9 @@ void verificarComando(char *com, char *atributos) {
 		}
 	//	printf("datos\n");
 		//imprimirDatos();
-		login();
+		//login();
 
-	} else if (strcasecmp(com, "logout") == 0) {
+	}/* else if (strcasecmp(com, "logout") == 0) {
 		//printf("logout\n");
 		logout();
 
