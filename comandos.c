@@ -424,7 +424,7 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		//    imprimirDatos();
-		//generarReporte();
+		generarReporte();
 
 	} else if (strcasecmp(com, "exec") == 0 || strcasecmp(com, "EXEC") == 0) {
 		// printf("exec\n");
@@ -853,7 +853,7 @@ void verificarComando(char *com, char *atributos) {
 		//imprimirDatos();
 		permiso();
 
-	} else if (strcasecmp(com, "mkfile") == 0) {
+	}*/ else if (strcasecmp(com, "mkfile") == 0) {
 		//       printf("mkfile\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -955,9 +955,9 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 	//	imprimirDatos();
-		mostrarContenido();
+	//	mostrarContenido();
 
-	} else if (strcasecmp(com, "rm") == 0) {
+	} /*else if (strcasecmp(com, "rm") == 0) {
 		//       printf("rm - Eliminar archivo\n");
 		char atr[200];
 		strcpy(atr, atributos);
