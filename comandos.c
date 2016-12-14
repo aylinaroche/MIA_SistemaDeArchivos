@@ -997,7 +997,7 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		//imprimirDatos();
-		//remover();
+		remover();
 
 	} else if (strcasecmp(com, "edit") == 0) {
 	//	printf("editar\n");
@@ -1092,7 +1092,7 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		// imprimirDatos();
-		//renombrar();
+		renombrar();
 	} else if (strcasecmp(com, "mkdir") == 0) {
 		//   printf("crear carpeta\n");
 		char atr[200];

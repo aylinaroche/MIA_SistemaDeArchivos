@@ -17,10 +17,11 @@ typedef struct ATRIBUTOS {
 typedef struct INODO {
 	int noInodo;
 	int size;
-	int bloquesAsig; //numero de bloques asignados
+	int noAsignados; //numero de bloques asignados
 	int bloques[4];
 	int indirecto; //apuntador indirecto por si ocupa mas de 4
 
+	int contador;
 	int uid;
 	char uID[16];
 	int gid;
@@ -52,7 +53,7 @@ typedef struct DATOS { //bloque
 
 typedef struct DETALLE { //detalle
 	archivo archivos[5]; //16
-	int d; //direc
+	//int d; //direc
 	int detalle; //Si ya no caben apunta a otro detalle
 } detalle;
 
@@ -66,11 +67,14 @@ typedef struct JOURNAL {
 	char nombre[50];
 	char contenido[50];
 	time_t fecha;
+
+
 ////
 //	datos datos;
 //int usuario;
 //char permiso[50];
 } journal;
+
 
 typedef struct SUPERBLOQUE {
 	char* nombre;

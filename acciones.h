@@ -68,7 +68,7 @@ int  obtenerArchivoUsers(char* id);
 //////////////////////////////////////
 void crearArchivo();
 int  crearArchivoParticion(char* id,char* path,char* p,char* size,char* cont);
-int  agregarArchivo(int posicion,superbloque super, char* ruta, char* name,char ajuste, char* contenido, int siz);
+int  agregarContenido(int posicion,superbloque super, char* ruta, char* name,char ajuste, char* contenido, int siz);
 int  crearCarpeta(char* ruta,superbloque super,avd apun,char*path,char*p,char ajuste, int inicio, int atras);
 void permiso();
 int  permisoArchivo(char* id,char* path,char* ugo, char* R);
