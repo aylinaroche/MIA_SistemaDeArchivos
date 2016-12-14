@@ -957,7 +957,7 @@ void verificarComando(char *com, char *atributos) {
 	//	imprimirDatos();
 	//	mostrarContenido();
 
-	} /*else if (strcasecmp(com, "rm") == 0) {
+	} else if (strcasecmp(com, "rm") == 0) {
 		//       printf("rm - Eliminar archivo\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -997,7 +997,7 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		//imprimirDatos();
-		remover();
+		//remover();
 
 	} else if (strcasecmp(com, "edit") == 0) {
 	//	printf("editar\n");
@@ -1050,7 +1050,7 @@ void verificarComando(char *com, char *atributos) {
 		}
 		//      	 imprimirDatos();
 		// printf("****");
-		editar();
+//		editar();
 
 	} else if (strcasecmp(com, "ren") == 0) {
 		//         printf("renombrar\n");
@@ -1092,7 +1092,7 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 		// imprimirDatos();
-		renombrar();
+		//renombrar();
 	} else if (strcasecmp(com, "mkdir") == 0) {
 		//   printf("crear carpeta\n");
 		char atr[200];
@@ -1136,7 +1136,7 @@ void verificarComando(char *com, char *atributos) {
 
 		crearDirectorio();
 
-	} else if (strcasecmp(com, "cp") == 0) {
+	} /*else if (strcasecmp(com, "cp") == 0) {
 		//      printf("copy\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -1230,7 +1230,7 @@ void verificarComando(char *com, char *atributos) {
 		//imprimirDatos();
 		mover();
 
-	} else if (strcasecmp(com, "find") == 0) {
+	} */else if (strcasecmp(com, "find") == 0) {
 	//	printf("find \n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -1283,7 +1283,7 @@ void verificarComando(char *com, char *atributos) {
 		//	 printf("que ");
 		encontrar();
 
-	} else if (strcasecmp(com, "chown") == 0) {
+	}/* else if (strcasecmp(com, "chown") == 0) {
 		//    printf("Cambiar propietario\n");
 		char atr[200];
 		strcpy(atr, atributos);

@@ -24,7 +24,7 @@ char letras[15];
 
 int main() {
 	//puts("!!!Hello puto World!!!"); /* prints !!!Hello World!!! */
-    printf("* * * * * * * * * * * * * COMANDOS . APP * * * * * * * * * * * * * \n");
+    printf("* * * * * * * * * * * * * COMANDOS . SA* * * * * * * * * * * * * \n");
     char com[1000];
     char com2[1000];
     int fdflags;

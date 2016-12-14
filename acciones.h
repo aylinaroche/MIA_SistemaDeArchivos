@@ -106,6 +106,7 @@ int   crearDirectorioArchivo(char* id, char* path, char* p);
 void  editar();
 void  mover();
 int   moverArchivo(char* id, char* path, char* dest, char* iddest);
+superbloque crearBloque();
 
 int  boolExec;
 mount montar[50];
