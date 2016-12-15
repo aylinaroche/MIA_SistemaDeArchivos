@@ -15,51 +15,46 @@ typedef struct ATRIBUTOS {
 } atrib;
 
 typedef struct INODO {
-	int noInodo;
-	int size;
-	int noAsignados; //numero de bloques asignados
-	int bloques[4];
-	int indirecto; //apuntador indirecto por si ocupa mas de 4
-
-	int contador;
+	int nLink; //enlace duro
+	char* pathLink;
 	int uid;
 	char uID[16];
 	int gid;
 	char gID[16];
+	int size;
+	time_t atime; //fecha que se leyo sin modificarlo
+	time_t ctime; //fecha en que se creo
+	time_t ntime; //fecha en que se modifico
+	int bloques[15];
 	char type;
 	char permisos[3];
-	int aux;
+
+	int aux; //Ind
+	int noAsignados; //bloques
+	int noInodo;
 } inodo;
 
 typedef struct ARCHIVO { //archivo
 	char name[12];
 	int inodo;
 	inodo ino;
-	time_t fechaCreacion;
-	time_t fechaModifica;
 } archivo;
 
-typedef struct AVD { //arbol virtual de directorio
-	time_t fechaCreacion;
-	char name[16];
+typedef struct AVD { //ad
+	char name[16]; //Tamanio de 64
 	int subDirectorios[6];
-	int directorio; //primer directorio
-	int apuntadorAVD; //apuntador para que sigan creciendo los directorios
+	int directorio;
+	int apuntadorAVD;
 } avd;
 
-typedef struct DATOS { //bloque
-	char data[64];
+typedef struct bloque { //bloque
+	char contenido[64];
 } datos;
 
 typedef struct DETALLE { //detalle
-	archivo archivos[5]; //16
-	//int d; //direc
-	int detalle; //Si ya no caben apunta a otro detalle
+	archivo archivos[4]; //16
+	int detalle; //direc
 } detalle;
-
-typedef struct USU {
-	int usuario;
-} usu;
 
 typedef struct JOURNAL {
 	int operacion;
@@ -67,48 +62,45 @@ typedef struct JOURNAL {
 	char nombre[50];
 	char contenido[50];
 	time_t fecha;
-
-
 ////
 //	datos datos;
 //int usuario;
 //char permiso[50];
 } journal;
 
-
 typedef struct SUPERBLOQUE {
 	char* nombre;
-	int arbolVirtualCount;
+	int inodosCount; //
+	int bloquesCount; //
+	int freeBloquesCount; //
+	int freeInodosCount; //
+	time_t DateCreacion; //
+	time_t DateMontaje; ///
+	int mountCount; //
+	int magic; //
+	int inodoSize; //
+	int bloqueSize; //
+	int firstFreeBitTablaInodo; //
+	int firstFreeBitBloque; //
+	int apuntadorBitTablaInodo; //
+	int apuntadorBitmapInodo; //
+	int apuntadorTablaInodo; //
+	int apuntadorBloques; //
+	int apuntadorCopia;
+	int apuntadorAVD;
+	int apuntadorLog;
+	int apuntadorBitArbolDirectorio; //ad
+	int apuntadorBitDetalleDirectorio;
+	int apuntadorDetalleDirectorio;
+	int arbolVirtualCount; //24
+	//
 	int detalleDirectorioCount;
-	int inodosCount;
-	int bloquesCount;
 	int freeArbolCount;
 	int freeDetalleDirectorioCount;
-	int freeBloquesCount;
-	int freeInodosCount;
-	time_t DateCreacion;
-	time_t DateMontaje;
-	int mountCount;
-	int apuntadorBitArbolDirectorio;
-	int apuntadorArbolDirectorio;
-	int apuntadorBitDetalleDirectorio; //Directorio = Carpeta
-	int apuntadorDetalleDirectorio;
-	int apuntadorBitTablaInodo;
-	int apuntadorTablaInodo;
-	int apuntadorBitBloques;
-	int apuntadorBloques;
-	int apuntadorLog;
 	int arbolDirectorioSize;
 	int detalleDirectorioSize;
-	int inodoSize;
-	int bloqueSize;
 	int firstFreeBitArbol;
 	int firstFreeBitDetalleDirectorio;
-	int firstFreeBitTablaInodo;
-	int firstFreeBitBloque;
-	int magic;
-	int apuntadorCopia;
-	int apuntadorBitmapInodo;
 } superbloque;
 
 typedef struct MONTAR { //Cola para realizar el mount
@@ -121,7 +113,7 @@ typedef struct MONTAR { //Cola para realizar el mount
 	int uso;
 } mount;
 
-typedef struct EBR { //Cambiar
+typedef struct EBR {
 	char status;
 	char fit;
 	int start;
@@ -132,7 +124,7 @@ typedef struct EBR { //Cambiar
 } ebr;
 
 typedef struct PARTICION {
-	char status; //1 activa, 0
+	char status; //1 activa, 0 caida
 	char type;
 	char fit; //ajuste
 	int start; //en que byte inicia

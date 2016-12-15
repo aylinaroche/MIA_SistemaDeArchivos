@@ -1,9 +1,3 @@
-/*
- * comandos.c
- *
- *  Created on: 4/08/2016
- *      Author: aylin
- */
 #include <stdlib.h>
 #include <stdio.h>
 #include "string.h"
@@ -295,8 +289,10 @@ void verificarComando(char *com, char *atributos) {
 		for (i = 1; i < cont - 1; i++) {
 			if (i == 1) {
 				atributoDisco(com1);
+				//printf("CCC = %s\n",com1);
 			} else if (i == 2) {
 				atributoDisco(com2);
+				//printf("CCC2 = %s\n",com2);
 			}
 		}
 
@@ -642,9 +638,9 @@ void verificarComando(char *com, char *atributos) {
 		}
 	//	printf("datos\n");
 		//imprimirDatos();
-		//login();
+		login();
 
-	}/* else if (strcasecmp(com, "logout") == 0) {
+	}else if (strcasecmp(com, "logout") == 0) {
 		//printf("logout\n");
 		logout();
 
@@ -853,7 +849,7 @@ void verificarComando(char *com, char *atributos) {
 		//imprimirDatos();
 		permiso();
 
-	}*/ else if (strcasecmp(com, "mkfile") == 0) {
+	}else if (strcasecmp(com, "mkfile") == 0) {
 		//       printf("mkfile\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -1136,7 +1132,7 @@ void verificarComando(char *com, char *atributos) {
 
 		crearDirectorio();
 
-	} /*else if (strcasecmp(com, "cp") == 0) {
+	} else if (strcasecmp(com, "cp") == 0) {
 		//      printf("copy\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -1230,7 +1226,7 @@ void verificarComando(char *com, char *atributos) {
 		//imprimirDatos();
 		mover();
 
-	} */else if (strcasecmp(com, "find") == 0) {
+	} else if (strcasecmp(com, "find") == 0) {
 	//	printf("find \n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -1283,7 +1279,7 @@ void verificarComando(char *com, char *atributos) {
 		//	 printf("que ");
 		encontrar();
 
-	}/* else if (strcasecmp(com, "chown") == 0) {
+	}else if (strcasecmp(com, "chown") == 0) {
 		//    printf("Cambiar propietario\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -1501,8 +1497,5 @@ void verificarComando(char *com, char *atributos) {
 
 	}
 
-
-
-	 */
 }
 

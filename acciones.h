@@ -14,15 +14,14 @@
 #include "estructuras.h"
 //#include "acciones.c"
 
-
+superbloque crearBloque();
+int multiploDeOcho(int tam);
 void atributoDisco(char* coman);
 void crearDisco();
 int  crearArchivoBinario(char* size, char* path, char* nom);
-int  multiploDeOcho(int tam);
 void imprimirDatos();
 void limpiarVariables();
 void metodoPrueba();
-void mostrarMontadas();
 int  eliminarDisco();
 void adminParticion();
 int  crearParticion(char* path,char* name,char* size,char* unit,char* type,char* fit);
@@ -106,7 +105,6 @@ int   crearDirectorioArchivo(char* id, char* path, char* p);
 void  editar();
 void  mover();
 int   moverArchivo(char* id, char* path, char* dest, char* iddest);
-superbloque crearBloque();
 
 int  boolExec;
 mount montar[50];
