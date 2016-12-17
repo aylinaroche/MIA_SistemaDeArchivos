@@ -15,23 +15,18 @@ typedef struct ATRIBUTOS {
 } atrib;
 
 typedef struct INODO {
-	int nLink; //enlace duro
-	char* pathLink;
+	int noInodo;
+	int size;
+	int noAsignados; //numero de bloques asignados
+	int bloques[4];
+	int indirecto; //apuntador indirecto por si ocupa mas de 4
+
 	int uid;
 	char uID[16];
 	int gid;
 	char gID[16];
-	int size;
-	time_t atime; //fecha que se leyo sin modificarlo
-	time_t ctime; //fecha en que se creo
-	time_t ntime; //fecha en que se modifico
-	int bloques[15];
 	char type;
 	char permisos[3];
-
-	int aux; //Ind
-	int noAsignados; //bloques
-	int noInodo;
 } inodo;
 
 typedef struct ARCHIVO { //archivo

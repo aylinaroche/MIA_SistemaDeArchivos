@@ -139,8 +139,7 @@ void verificarComando(char *com, char *atributos) {
 		}
 		// imprimirDatos();
 		crearDisco();
-	}
-	else if (strcasecmp(com, "rmdisk") == 0 || strcasecmp(com, "Rmdisk") == 0
+	} else if (strcasecmp(com, "rmdisk") == 0 || strcasecmp(com, "Rmdisk") == 0
 			|| strcasecmp(com, "RMdisk") == 0
 			|| strcasecmp(com, "RMDISK") == 0) {
 		//	 printf("rmdisk\n");
@@ -264,26 +263,26 @@ void verificarComando(char *com, char *atributos) {
 		char aux[100];
 		strcpy(aux, atributos);
 		inst = strtok(atributos, " ");
-		int bool=0;
+		int bool = 0;
 		while (inst != NULL) {
 			inst = strtok(NULL, " ");
 
-		if(inst!=NULL){
-			if(strcmp(inst,"+") == 0){
-				mostrarMontadas();
-				bool = 1;
-			}else{
-				switch (cont) {
-				case 1:
-					com1 = inst;
-					break;
-				case 2:
-					com2 = inst;
-					break;
+			if (inst != NULL) {
+				if (strcmp(inst, "+") == 0) {
+					mostrarMontadas();
+					bool = 1;
+				} else {
+					switch (cont) {
+					case 1:
+						com1 = inst;
+						break;
+					case 2:
+						com2 = inst;
+						break;
+					}
 				}
+				cont++;
 			}
-			cont++;
-		}
 		}
 		int i;
 		for (i = 1; i < cont - 1; i++) {
@@ -296,7 +295,7 @@ void verificarComando(char *com, char *atributos) {
 			}
 		}
 
-		if(bool!=1){
+		if (bool != 1) {
 			montarP();
 			mostrarMontadas();
 		}
@@ -406,6 +405,9 @@ void verificarComando(char *com, char *atributos) {
 			case 3:
 				com3 = inst;
 				break;
+			case 4:
+				com4 = inst;
+				break;
 			}
 			cont++;
 		}
@@ -417,6 +419,8 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com2);
 			} else if (i == 3) {
 				atributoDisco(com3);
+			} else if (i == 4) {
+				atributoDisco(com4);
 			}
 		}
 		//    imprimirDatos();
@@ -500,7 +504,7 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com4);
 			}
 		}
-	//	imprimirDatos();
+		//	imprimirDatos();
 		espacioLibre();
 
 	} else if (strcasecmp(com, "du") == 0) {
@@ -542,7 +546,7 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com3);
 			}
 		}
-	//	imprimirDatos();
+		//	imprimirDatos();
 		espacioUsado();
 
 	} else if (strcasecmp(com, "mkfs") == 0) {
@@ -598,7 +602,7 @@ void verificarComando(char *com, char *atributos) {
 		formatear();
 
 	} else if (strcasecmp(com, "login") == 0) {
-	//	printf("login\n");
+		//	printf("login\n");
 		char atr[200];
 		strcpy(atr, atributos);
 		int j;
@@ -636,11 +640,11 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com3);
 			}
 		}
-	//	printf("datos\n");
+		//	printf("datos\n");
 		//imprimirDatos();
 		login();
 
-	}else if (strcasecmp(com, "logout") == 0) {
+	} else if (strcasecmp(com, "logout") == 0) {
 		//printf("logout\n");
 		logout();
 
@@ -678,7 +682,7 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com2);
 			}
 		}
-	//	imprimirDatos();
+		//	imprimirDatos();
 		crearGrupo();
 
 	} else if (strcasecmp(com, "rmgrp") == 0) {
@@ -799,7 +803,7 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com2);
 			}
 		}
-	//	imprimirDatos();
+		//	imprimirDatos();
 		eliminarUsuario();
 
 	} else if (strcasecmp(com, "chmod") == 0) {
@@ -849,7 +853,7 @@ void verificarComando(char *com, char *atributos) {
 		//imprimirDatos();
 		permiso();
 
-	}else if (strcasecmp(com, "mkfile") == 0) {
+	} else if (strcasecmp(com, "mkfile") == 0) {
 		//       printf("mkfile\n");
 		char atr[200];
 		strcpy(atr, atributos);
@@ -950,8 +954,8 @@ void verificarComando(char *com, char *atributos) {
 				atributoDisco(com5);
 			}
 		}
-	//	imprimirDatos();
-	//	mostrarContenido();
+		//	imprimirDatos();
+		mostrarContenido();
 
 	} else if (strcasecmp(com, "rm") == 0) {
 		//       printf("rm - Eliminar archivo\n");
@@ -996,7 +1000,7 @@ void verificarComando(char *com, char *atributos) {
 		remover();
 
 	} else if (strcasecmp(com, "edit") == 0) {
-	//	printf("editar\n");
+		//	printf("editar\n");
 		char atr[200];
 		strcpy(atr, atributos);
 		int j;
@@ -1046,7 +1050,7 @@ void verificarComando(char *com, char *atributos) {
 		}
 		//      	 imprimirDatos();
 		// printf("****");
-//		editar();
+		editar();
 
 	} else if (strcasecmp(com, "ren") == 0) {
 		//         printf("renombrar\n");
@@ -1227,7 +1231,7 @@ void verificarComando(char *com, char *atributos) {
 		mover();
 
 	} else if (strcasecmp(com, "find") == 0) {
-	//	printf("find \n");
+		//	printf("find \n");
 		char atr[200];
 		strcpy(atr, atributos);
 		int j;
@@ -1279,7 +1283,7 @@ void verificarComando(char *com, char *atributos) {
 		//	 printf("que ");
 		encontrar();
 
-	}else if (strcasecmp(com, "chown") == 0) {
+	} else if (strcasecmp(com, "chown") == 0) {
 		//    printf("Cambiar propietario\n");
 		char atr[200];
 		strcpy(atr, atributos);

@@ -6,6 +6,7 @@
 #include <math.h>
 # include <setjmp.h>
 
+char* ruta = NULL;
 char* size = NULL;
 char* unit = NULL;
 char* path = NULL;
@@ -69,7 +70,7 @@ char *tex7 = NULL;
 char *tex8 = NULL;
 atrib atrUsuario[50];
 atrib atribUsuario[50];
-int contadorM ;
+int contadorM;
 
 void limpiarVariables() {
 	size = NULL;
@@ -102,6 +103,7 @@ void limpiarVariables() {
 	file2 = NULL;
 	file3 = NULL;
 	allocation = NULL;
+	ruta = NULL;
 	//contadorM = 0;
 //	boolEditar=0;
 }
@@ -181,7 +183,28 @@ void atributoDisco(char* coman) {
 			}
 			strcpy(token1, direccion);
 			path = token1;
-		} else if (strcasecmp(token1, "+tipo") == 0) {
+		}else if (strcasecmp(token1, "-ruta") == 0
+				|| strcasecmp(token1, "–ruta") == 0
+				|| strcasecmp(token1, "+ruta") == 0) {
+			token1 = strtok(NULL, ">");
+			char direccion[200];
+			strcpy(direccion, token1);
+			if (direccion[0] == '"') {
+				int i = 0;
+				while (direccion[i + 1] != '"') { //Le quita las comillas
+					direccion[i] = direccion[i + 1];
+					if (direccion[i] == ' ') {
+						direccion[i] = '_';
+					}
+					i++;
+				}
+				direccion[i] = '\0';
+				direccion[i + 1] = '\0';
+			}
+			strcpy(token1, direccion);
+			ruta = token1;
+			//printf("token1 = %s",token1);
+		}  else if (strcasecmp(token1, "+tipo") == 0) {
 			token1 = strtok(NULL, ">");
 			type = token1;
 		} else if (strcasecmp(token1, "+fit") == 0) {
@@ -1390,7 +1413,7 @@ int montarParticion(char* path, char* name) {
 		for (j = 0; j < 20; j++) {
 			if (strcasecmp(structDisco.part[i].exten[j].name, name) == 0) {
 				//printf("%s * * * %s\n", structDisco.part[i].exten[j].name,
-			//			name);
+				//			name);
 
 				boolExten = 1;
 				break;
@@ -1493,8 +1516,30 @@ int montarParticion(char* path, char* name) {
 		printf("-> Se monto la particion con id::%s correctamente.\n", str);
 		contadorM = contadorM + 1;
 	}
+	/*
+	 //VERIFICAR SI EL NOMBRE COINCIDE CON LA PARTICION
+	 int j = 0;
+	 int existeLogica = 0;
+	 superbloque sb;
+	 char ajuste;
 
+	 int posicion;
+	 if (existeLogica == 1) {
+	 posicion = structDisco.part[i].exten[j].start;
+	 ajuste = structDisco.part[i].exten[j].fit;
+	 fseek(archivo, structDisco.part[i].exten[j].start, SEEK_SET);
+	 fread(&sb, sizeof(superbloque), 1, archivo);
+	 } else {
+	 posicion = structDisco.part[i].start;
+	 ajuste = structDisco.part[i].fit;
+	 fseek(archivo, structDisco.part[i].start, SEEK_SET);
+	 fread(&sb, sizeof(superbloque), 1, archivo);
+	 }
+	 printf("MAGIC = %d\n", sb.magic);
+	 sb.mountCount = 5;
+	 */
 	fclose(archivo);
+
 	return 1;
 }
 
@@ -1810,7 +1855,8 @@ void formatear() {
 		} else {
 			setbuf(stdin, NULL);
 			fflush(NULL);
-			//	crearArchivoParticion(id, "/home/users.txt", "si", "16384", NULL);
+			crearArchivoParticion(id, "/home/users.txt", "si", "16384",
+					"/home/aylin/users.txt");
 			boolEditar = 1;
 			fflush(NULL);
 			//crearGrupoDisco(id,"root");
@@ -2249,8 +2295,8 @@ int crearArchivoParticion(char* id, char* path, char* p, char* size, char* cont)
 				if (archivoCont != NULL || archivoCont != 0x0) {
 					setbuf(stdin, NULL);
 					fflush(NULL);
-					int a = agregarContenido(datos, sb, ruta, rutaC, ajuste,
-							leer, tamanio);
+					agregarContenido(datos, sb, ruta, rutaC, ajuste, leer,
+							tamanio);
 					//cambiarPermiso(datos,sb,ruta, rutaC, "664","0");
 					fflush(NULL);
 					//printf("Contenido = %s\n",contenido);
@@ -2263,6 +2309,7 @@ int crearArchivoParticion(char* id, char* path, char* p, char* size, char* cont)
 					}
 					//bitacora(sb.apuntadorJournal, 1, path, contenido, sb, ruta);
 				} else {
+					printf("else\n");
 					//contenido[0]= 'n';
 				}
 				//	printf("Contenido = %s\n",contenido);
@@ -2377,10 +2424,6 @@ int agregarContenido(int posicion, superbloque super, char* ruta, char* name,
 		fclose(disco);
 
 		inodo ino;
-		ino.atime = time(0);
-		ino.ctime = time(0);
-		ino.ntime = time(0);
-
 		ino.noAsignados = pos;
 		ino.size = size;
 
@@ -2401,7 +2444,7 @@ int agregarContenido(int posicion, superbloque super, char* ruta, char* name,
 			if (size % 25 > 0) {
 				ino.noInodo++;
 			}
-			ino.aux = 0;
+			ino.indirecto = 0;
 			setbuf(stdin, NULL);
 			for (l = 0; l < ino.noInodo; l++) {
 				if (ajuste == 'w') {
@@ -2469,7 +2512,7 @@ int agregarContenido(int posicion, superbloque super, char* ruta, char* name,
 			inodo ino2;
 			ino2.noAsignados = pos3;
 			ino2.size = size;
-			ino2.aux = 0;
+			ino2.indirecto = 0;
 			ino2.noInodo = (size - 100) / 25;
 			if ((size - 100) % 25 > 0) {
 				ino2.noInodo++;
@@ -2506,7 +2549,7 @@ int agregarContenido(int posicion, superbloque super, char* ruta, char* name,
 			}
 
 			disco = fopen(ruta, "rb+");
-			ino.aux = super.apuntadorDetalleDirectorio
+			ino.indirecto = super.apuntadorDetalleDirectorio
 					+ 100 * pos3 * sizeof(inodo);
 			fseek(disco,
 					super.apuntadorDetalleDirectorio
@@ -2541,7 +2584,7 @@ int crearCarpeta(char* ruta, superbloque super, avd apun, char* path, char* p,
 	fread(&apun, sizeof(avd), 1, archivo);
 	int i = 0, x = 0, w = 0, qw = 0;
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 6; i++) {
 		//	printf("sub carpeta =%d\n",apun.subCarpetas[i]);
 		if (apun.subDirectorios[i] > 0) {	//Si ya existe la carpeta
 			fseek(archivo, apun.subDirectorios[i], SEEK_SET);
@@ -2558,7 +2601,7 @@ int crearCarpeta(char* ruta, superbloque super, avd apun, char* path, char* p,
 		}
 	}
 	//printf("i = %d\n",i);
-	if (i < 4) {
+	if (i < 6) {
 		path = strtok(NULL, "/");
 		//	printf("path=%s\n", path);
 		if (path != NULL && path != 0x0) {
@@ -2570,7 +2613,7 @@ int crearCarpeta(char* ruta, superbloque super, avd apun, char* path, char* p,
 //			correcto=0;
 			return 1;
 		}
-	} else if (i > 3 && x > 0) {
+	} else if (i > 5 && x > 0) {
 		if (p != NULL) {
 			int pos = 0;
 			fclose(archivo);
@@ -2618,7 +2661,7 @@ int crearCarpeta(char* ruta, superbloque super, avd apun, char* path, char* p,
 			printf("*ERROR: La ruta indicada no existe.\n");
 			return 0;
 		}
-	} else if (i > 3 && x < 1) {
+	} else if (i > 5 && x < 1) {
 		//printf("apun == %d\n",apun.apuntador);
 
 		if (apun.apuntadorAVD < 0) {
@@ -3007,7 +3050,7 @@ int removerArchivo(char* id, char* path, int rf) {
 		printf("ERROR: No existe el nombre indicado.\n");
 		return 0;
 	}
-	superbloque sb;
+	superbloque sb = crearBloque();
 	char ajuste;
 
 	int posicion;
@@ -3022,7 +3065,7 @@ int removerArchivo(char* id, char* path, int rf) {
 		fseek(archivo, structDisco.part[i].start, SEEK_SET);
 		fread(&sb, sizeof(superbloque), 1, archivo);
 	}
-
+	printf("M= %d\n", sb.magic);
 	if (sb.magic == 201404368) {
 		fseek(archivo, sb.apuntadorAVD, SEEK_SET);
 		avd ap;
@@ -3074,15 +3117,13 @@ int removerArchivo(char* id, char* path, int rf) {
 		}
 		ruta2 = strtok(crear, ".");
 
-		//fclose(archivo);
-		//int informacion = 0;
 		int datos = 0;
 
 		if (b < 1) {
 			ruta1 = strtok(crear, "/");
 			printf("Eliminar Carpeta.\n");
 			eliminarCarpeta(ruta, sb, ruta1, sb.apuntadorAVD);
-			bitacora(sb.apuntadorLog, 3, path, " ", sb, ruta); ///****
+			//bitacora(sb.apuntadorLog, 3, path, " ", sb, ruta); ///****
 		} else {
 			ruta1 = strtok(verificar2, "/");
 
@@ -3125,21 +3166,20 @@ int eliminarCarpeta(char* ruta, superbloque super, char* path, int posicion) {
 
 	int i = 0;
 	for (i = 0; i < 4; i++) {
-
 		if (ap.subDirectorios[i] > 0) {
 			fseek(disco, ap.subDirectorios[i], SEEK_SET);
 			fread(&ap2, sizeof(ap2), 1, disco);
-			//char* yt = path;
 			if (strcasecmp(ap2.name, path) == 0) {
 				break;
 			}
 		}
 	}
+	printf("i= %d\n", i);
 	if (i < 4) {
 		path = strtok(NULL, "/");
 		if (path != NULL && path != 0x0) {
 			fclose(disco);
-			return eliminarCarpeta(ruta, super, path, ap.subDirectorios[i]);
+			return 1; //eliminarCarpeta(ruta, super, path, ap.subDirectorios[i]);
 		} else {
 			int c = ap.subDirectorios[i];
 			ap.subDirectorios[i] = -1;
@@ -3148,9 +3188,9 @@ int eliminarCarpeta(char* ruta, superbloque super, char* path, int posicion) {
 			int pos = (c - super.apuntadorAVD) / (100 * sizeof(avd));
 
 			char ok = '0';
-			fseek(disco, super.apuntadorBitArbolDirectorio + pos, SEEK_SET);
-			fwrite(&ok, 1, 1, disco);
-			fclose(disco);
+			/*fseek(disco, super.apuntadorBitArbolDirectorio, SEEK_SET);
+			 fwrite(&ok, 1, 1, disco);
+			 */ //fclose(disco);
 			printf("-> Se elimino la carpeta correctamente.\n");
 			return eliminarCarpetaCompleta(ruta, super, c);
 		}
@@ -3177,7 +3217,7 @@ int eliminarCarpetaCompleta(char*ruta, superbloque super, int posicion) {
 
 	int i = 0;
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 6; i++) {
 		// int m=ap.subCarpetas[i];
 
 		if (ap.subDirectorios[i] > 0) {
@@ -3191,6 +3231,7 @@ int eliminarCarpetaCompleta(char*ruta, superbloque super, int posicion) {
 			fseek(archivo, super.apuntadorBitArbolDirectorio + pos, SEEK_SET);
 			fwrite(&ok, 1, 1, archivo);
 			fclose(archivo);
+			printf("eliminar com\n");
 			eliminarCarpetaCompleta(ruta, super, c);
 		}
 	}
@@ -3206,7 +3247,8 @@ int eliminarCarpetaCompleta(char*ruta, superbloque super, int posicion) {
 		fseek(archivo, super.apuntadorBitArbolDirectorio + pos, SEEK_SET);
 		fwrite(&ok, 1, 1, archivo);
 		fclose(archivo);
-		eliminarCarpetaCompleta(ruta, super, c);
+		printf("eliminarC\n");
+		//eliminarCarpetaCompleta(ruta, super, c);
 	}
 	if (ap.directorio > 50) {
 		archivo = fopen(ruta, "rb+");
@@ -3220,7 +3262,6 @@ int eliminarCarpetaCompleta(char*ruta, superbloque super, int posicion) {
 		fseek(archivo, super.apuntadorBitDetalleDirectorio + pos, SEEK_SET);
 		fwrite(&yeah, 1, 1, archivo);
 		fclose(archivo);
-//`      eliminarCarpetaCompleta(ruta,super,c);
 	}
 }
 
@@ -3234,7 +3275,7 @@ int eliminarArchivo(int posicion, superbloque super, char* ruta, char* name) {
 	int contenidoInodo;
 	char* contenidoNombre;
 
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 5; i++) {
 		contenidoInodo = carp.archivos[i].inodo;
 		contenidoNombre = carp.archivos[i].name;
 		if (carp.archivos[i].inodo > 1) {
@@ -3244,7 +3285,7 @@ int eliminarArchivo(int posicion, superbloque super, char* ruta, char* name) {
 		}
 	}
 	char v = '0';
-	if (i < 3) {
+	if (i < 5) {
 		carp.archivos[i].inodo = -1;
 		strcpy(carp.archivos[i].name, "");
 		fseek(archivo, posicion, SEEK_SET);
@@ -3272,9 +3313,9 @@ int eliminarArchivo(int posicion, superbloque super, char* ruta, char* name) {
 		}
 		// int most =conx.indirecto;
 		inodo inodo2;
-		if (ino.aux > 0) {
+		if (ino.indirecto > 0) {
 
-			fseek(archivo, ino.aux, SEEK_SET);
+			fseek(archivo, ino.indirecto, SEEK_SET);
 			fread(&inodo2, sizeof(inodo), 1, archivo);
 			cont = inodo2.noAsignados;
 			inodo2.noAsignados = -1;
@@ -3287,7 +3328,7 @@ int eliminarArchivo(int posicion, superbloque super, char* ruta, char* name) {
 				fseek(archivo, super.apuntadorBitmapInodo + aux, SEEK_SET);
 				fwrite(&v, 1, 1, archivo);
 			}
-			fseek(archivo, ino.aux, SEEK_SET);
+			fseek(archivo, ino.indirecto, SEEK_SET);
 			fwrite(&inodo2, sizeof(inodo), 1, archivo);
 		}
 		fclose(archivo);
@@ -3415,7 +3456,7 @@ int peorAjuste(int bloque, char* ruta, int inicio, int arch) {
 }
 
 void copiar() {
-
+//Error raiz archivo
 	if (id == NULL || path == NULL || dest == NULL || iddest == NULL) {
 		printf("ERROR: Falta un atributo obligatorio.\n");
 	} else {
@@ -3483,7 +3524,7 @@ int copiarArchivo(char* id, char* path, char* dest, char* iddest) {
 		printf("ERROR: No existe el nombre indicado.\n");
 		return 0;
 	}
-	superbloque sb;
+	superbloque sb = crearBloque();
 	char ajuste;
 	int posicion;
 	if (esLogica == 1) {
@@ -3545,15 +3586,16 @@ int copiarArchivo(char* id, char* path, char* dest, char* iddest) {
 			ruta1 = strtok(verificar, "/");
 		}
 		ruta2 = strtok(crear, ".");
-		//fclose(archivo);
-		//int informacion = 0;
+
 		int datos = 0;
 		if (b < 1) {
 			ruta1 = strtok(crear, "/");
+			//printf("copiar\n");
 			copiarCarpeta(ruta, sb, ruta1, sb.apuntadorAVD, dest, iddest);
-			;
+
 			bitacora(sb.apuntadorLog, 3, path, " ", sb, ruta); ///****
 		} else {
+			printf("buscar\n");
 			ruta1 = strtok(verificar2, "/");
 			datos = buscarArchivo(ruta, sb, ap, ruta1, posicion, ajuste,
 					sb.apuntadorAVD);
@@ -3584,7 +3626,8 @@ int copiarArchivo(char* id, char* path, char* dest, char* iddest) {
 					strcat(auxRuta, dest);
 					strcat(auxRuta, "/");
 					strcat(auxRuta, ruta1);
-					crearArchivo(iddest, auxRuta, NULL, NULL,
+					printf("crear\n");
+					crearArchivoParticion(iddest, auxRuta, NULL, NULL,
 							"/home/aylin/auxContenido.txt");
 				}
 			} else {
@@ -3609,7 +3652,7 @@ int copiarCarpeta(char* ruta, superbloque super, char* path, int posicion,
 	fread(&ap, sizeof(avd), 1, disco);
 	// char* n=ap.name;
 	int i = 0;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 6; i++) {
 		//int n=ap.subdirectorios[i];
 		if (ap.subDirectorios[i] > 50) {
 			fseek(disco, ap.subDirectorios[i], SEEK_SET);
@@ -3621,7 +3664,7 @@ int copiarCarpeta(char* ruta, superbloque super, char* path, int posicion,
 			}
 		}
 	}
-	if (i < 4) {
+	if (i < 6) {
 		char* copia = path;
 		path = strtok(NULL, "/");
 		if (path != NULL && path != 0x0) {
@@ -3630,6 +3673,7 @@ int copiarCarpeta(char* ruta, superbloque super, char* path, int posicion,
 					iddest);
 		} else {
 			int sub = ap.subDirectorios[i];
+			//printf("else\n");
 			printf("-> Se copio la carpeta correctamente.\n");
 			fclose(disco);
 			return copiarRaizCarpeta(ruta, super, sub, iddest, dest);
@@ -3648,6 +3692,7 @@ int copiarCarpeta(char* ruta, superbloque super, char* path, int posicion,
 
 int copiarRaizCarpeta(char* ruta, superbloque super, int posicion, char* iddest,
 		char* dest) {
+//	printf("raizCarpeta\n");
 	FILE* archivo;
 	archivo = fopen(ruta, "rb+");
 	avd ap;
@@ -3667,6 +3712,7 @@ int copiarRaizCarpeta(char* ruta, superbloque super, int posicion, char* iddest,
 	strcat(llenar, ap.name);
 	fclose(archivo);
 	crearCopia(iddest, llenar, NULL);
+	printf("holi\n");
 
 	for (i = 0; i < 4; i++) {
 		//int n=con.subdirectorios[i];
@@ -3675,16 +3721,20 @@ int copiarRaizCarpeta(char* ruta, superbloque super, int posicion, char* iddest,
 			copiarRaizCarpeta(ruta, super, sub, iddest, llenar);
 		}
 	}
-	int lol = ap.apuntadorAVD;
+	//int lol = ap.apuntadorAVD;
+	//printf("lol = %d = %d\n",ap.apuntadorAVD, ap.directorio);
 	if (ap.apuntadorAVD > 0) {
 		copiarRaizCarpeta(ruta, super, ap.apuntadorAVD, iddest, dest);
 	}
 	if (ap.directorio > 0) {
 		copiarRaizArchivo(ruta, super, ap.directorio, iddest, llenar);
 	}
+	//printf("casi\n");
+	return 1;
 }
 
 int crearCopia(char* id, char* path, char* p) {
+	//printf("crearCopia\n");
 	char* ruta;
 	char* nombre;
 	int i = 0;
@@ -3723,7 +3773,7 @@ int crearCopia(char* id, char* path, char* p) {
 		if (strcasecmp(structDisco.part[i].name, nombre) == 0) {
 			break;
 		}
-		for (j = 0; j < 8; j++) {
+		for (j = 0; j < 20; j++) {
 			if (strcasecmp(structDisco.part[i].exten[j].name, name) == 0) {
 				esLogica = 1;
 				break;
@@ -3793,17 +3843,20 @@ int crearCopia(char* id, char* path, char* p) {
 		int datos;
 		correcto = 1;
 		if (p == NULL) {
-			printf("p=NULL\n");
+			//		printf("p=NULL\n");
 			datos = crearCarpeta(ruta, sb, ap, ruta1, p, ajuste, posicion,
 					sb.apuntadorAVD);
 			ruta1 = strtok(crear, "/");
 			if (correcto > 0) {
-				printf("correcto= %d\n", correcto);
+//				printf("correctooooo= %d\n", correcto);
+
 				datos = crearCarpeta(ruta, sb, ap, ruta1, "si", ajuste,
 						posicion, sb.apuntadorAVD);
+				//		printf("murio\n");
+
 			}
 		} else {
-			printf("p!=NULL\n");
+			//	printf("p!=NULL\n");
 			ruta1 = strtok(crear, "/");
 			datos = crearCarpeta(ruta, sb, ap, ruta1, p, ajuste, posicion,
 					sb.apuntadorAVD);
@@ -3812,10 +3865,12 @@ int crearCopia(char* id, char* path, char* p) {
 	} else {
 		printf("ERROR: No se ha formateado la particion.");
 	}
+	return 1;
 }
 
 int copiarRaizArchivo(char* ruta, superbloque super, int posicion, char* iddest,
 		char* dest) {
+	//printf("raizArchivo\n");
 	FILE* archivo;
 	archivo = fopen(ruta, "rb+");
 	detalle carp;
@@ -3827,11 +3882,13 @@ int copiarRaizArchivo(char* ruta, superbloque super, int posicion, char* iddest,
 
 	fclose(archivo);
 	for (i = 0; i < 3; i++) {
+		//	printf("FOR = %d\n", carp.archivos[i].inodo);
 		if (carp.archivos[i].inodo > 50) {
 			char mensaje[200];
 			for (j = 0; j < 200; j++) {
 				mensaje[j] = '\0';
 			}
+			//	printf("contenido\n");
 			strcpy(mensaje,
 					contenidoArchivo(" ", posicion, super, ruta,
 							carp.archivos[i].name));
@@ -3847,10 +3904,13 @@ int copiarRaizArchivo(char* ruta, superbloque super, int posicion, char* iddest,
 			strcat(aux, "/");
 			strcat(aux, carp.archivos[i].name);
 			char* enviado = aux;
-			crearArchivo(iddest, enviado, NULL, NULL,
+			//printf("crear\n");
+			crearArchivoParticion(iddest, enviado, NULL, NULL,
 					"/home/aylin/archivoAux.txt");
+			//printf("fin crearr\n");
 		}
 	}
+	//printf("carpeta = %d\n", carp.detalle);
 	if (carp.detalle > 50) {
 		copiarRaizArchivo(ruta, super, carp.detalle, iddest, dest);
 	}
@@ -3865,7 +3925,7 @@ char* contenidoArchivo(char* contenido, int posicion, superbloque super,
 	fseek(archivo, posicion, SEEK_SET);
 	fread(&carp, sizeof(detalle), 1, archivo);
 	int i = 0;
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 5; i++) {
 		// char* m =carp.archivos[i].name;
 		if (carp.archivos[i].inodo > 1) {
 			if (strcasecmp(carp.archivos[i].name, name) == 0) {
@@ -3873,7 +3933,7 @@ char* contenidoArchivo(char* contenido, int posicion, superbloque super,
 			}
 		}
 	}
-	if (i < 3) {
+	if (i < 5) {
 		//se supone que obtiene el contenido
 		inodo ino;
 		fseek(archivo, carp.archivos[i].inodo, SEEK_SET);
@@ -3897,7 +3957,7 @@ char* contenidoArchivo(char* contenido, int posicion, superbloque super,
 				contenido = &texto;
 			}
 			inodo ino2;
-			fseek(archivo, ino.aux, SEEK_SET);
+			fseek(archivo, ino.indirecto, SEEK_SET);
 			fread(&ino2, sizeof(inodo), 1, archivo);
 			if (ino2.noInodo > 4) {
 				ino2.noInodo = 4;
@@ -3945,7 +4005,6 @@ char* contenidoArchivo(char* contenido, int posicion, superbloque super,
 }
 
 void renombrar() {
-
 	if (id == NULL || path == NULL || name == NULL) {
 		printf("ERROR: Falta un atributo obligatorio.\n");
 	} else {
@@ -3955,7 +4014,6 @@ void renombrar() {
 					"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 		}
 	}
-
 }
 
 int renombrarArchivo(char* id, char* path, char* name) {
@@ -4081,7 +4139,7 @@ int renombrarArchivo(char* id, char* path, char* name) {
 				char contenido[100];
 				strcat(contenido, "-name:");
 				strcat(contenido, name);
-				bitacora(sb.apuntadorLog, 5, path, contenido, sb, ruta);
+				//bitacora(sb.apuntadorLog, 5, path, contenido, sb, ruta);
 				return 1;
 			}
 		} else {
@@ -4102,14 +4160,14 @@ int cambiarNombre(int posicion, superbloque super, char* ruta, char* nombre,
 	fseek(archivo, posicion, SEEK_SET);
 	fread(&carp, sizeof(detalle), 1, archivo);
 	int i = 0;
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 5; i++) {
 		if (carp.archivos[i].inodo > 1) {
 			if (strcasecmp(carp.archivos[i].name, nombre) == 0) {
 				break;
 			}
 		}
 	}
-	if (i < 3) {
+	if (i < 5) {
 		strcpy(carp.archivos[i].name, nombreNuevo);
 		fseek(archivo, posicion, SEEK_SET);
 		fwrite(&carp, sizeof(detalle), 1, archivo);
@@ -4582,7 +4640,7 @@ int crearDirectorioArchivo(char* id, char* path, char* p) {
 			datos = crearCarpeta(ruta, sb, ap, ruta2, p, ajuste, posicion,
 					sb.apuntadorAVD);
 		}
-		bitacora(sb.apuntadorLog, 6, path, " ", sb, ruta);
+		//bitacora(sb.apuntadorLog, 6, path, " ", sb, ruta);
 
 	} else {
 		printf("No ha formateado la particion");
@@ -4628,11 +4686,18 @@ int moverArchivo(char* id, char* path, char* dest, char* iddest) {
 	}
 }
 
+void logg() {
+	boolLogin = 1;
+	usrLogin = "root";
+}
+
 void login() {
-	if (usuario == NULL || password == NULL || id == NULL) {
+	if (usuario == NULL || password == NULL) {
 		printf("ERROR: Falta un atributo obligatorio.\n");
 	} else {
-		int d = loginUsuario(usuario, password, id);
+		logg();
+		//int d = loginUsuario(usuario, password);
+		int d = iniciarSesion(usuario, password);
 		if (d == 0) {
 			printf(
 					"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
@@ -4640,7 +4705,7 @@ void login() {
 	}
 }
 
-int loginUsuario(char* usuario, char* password, char* id) {
+int loginUsuario(char* usuario, char* password) {
 	//printf("ll\n");
 	int o = obtenerArchivoUsers(id);
 	if (o == 1) {
@@ -4654,7 +4719,7 @@ int loginUsuario(char* usuario, char* password, char* id) {
 			return 0;
 		} else {
 			atributos = contenidoUsers;
-//		printf("BUFFER::\n%s\n",atributos);
+			printf("BUFFER::\n%s\n", atributos);
 			char atr[200];
 			strcpy(atr, atributos);
 			int j;
@@ -4668,7 +4733,7 @@ int loginUsuario(char* usuario, char* password, char* id) {
 			char *auxInst = NULL;
 			strcpy(aux, atributos);
 			inst = strtok(atributos, "\n");
-			//printf("i = %s\n",inst);
+			printf("i = %s\n", inst);
 			auxInst = inst;
 			atrUsuario[con2].atributos = auxInst;
 			con2++;
@@ -4679,7 +4744,7 @@ int loginUsuario(char* usuario, char* password, char* id) {
 				con2++;
 			}
 			int i;
-			for (i = 1; i < con2; i++) {
+			for (i = 1; i < con2 - 1; i++) {
 				//			printf("atr = %s\n",atrUsuario[i].atributos);
 				if (atrUsuario[i].atributos != NULL) {
 					int v = verificarLogin(atrUsuario[i].atributos, usuario,
@@ -4707,6 +4772,7 @@ int loginUsuario(char* usuario, char* password, char* id) {
 }
 
 int verificarLogin(char* atributos, char* usuario, char* password) {
+	printf("atributos = %s\n", atributos);
 	char* instruc = NULL;
 	con = 1;
 	char atr[200];
@@ -4754,7 +4820,7 @@ int verificarLogin(char* atributos, char* usuario, char* password) {
 					printf("-> El usuario ha sido eliminado.\n");
 					return 0;
 				} else {
-					printf("-> El usuario %s se ha journaleado exitosamente.\n",
+					printf("-> El usuario %s se ha logeado exitosamente.\n",
 							usuario);
 					return 1;
 				}
@@ -4762,6 +4828,140 @@ int verificarLogin(char* atributos, char* usuario, char* password) {
 		}
 	}
 	return 0;
+}
+
+int iniciarSesion(char* usuario, char* password) {
+//	printf("filen= %s\n",filen);
+	char* ruta;
+	char* nombre;
+	int i = 0;
+	for (i = 0; i < 31; i++) {
+		if (montar[i].vdID != NULL) {
+			//printf("NOT NULL -> %s-%s-\n",montar[i].vdID,id);
+			if (strcasecmp(montar[i].vdID, "vda1") == 0) {
+				if (montar[i].estado == 1) {
+					ruta = montar[i].path; //%%%
+					nombre = montar[i].name;
+					break;
+				}
+			}
+		}
+	}
+	if (i == 31) {
+		printf("ERROR: El ID no existe.\n");
+		return 0;
+	}
+
+	FILE* archivo;
+	archivo = fopen(ruta, "rb+");
+	if (archivo == NULL) {
+		printf("ERROR: No existe el disco.\n");
+		return 0;
+	}
+	mbr structDisco;
+	fseek(archivo, 0, SEEK_SET);
+	fread(&structDisco, sizeof(mbr), 1, archivo);
+
+//VERIFICAR LA PARTICION
+	i = 0;
+	int j = 0;
+	int esLogica = 0;
+	for (i = 0; i < 4; i++) {
+		if (strcasecmp(structDisco.part[i].name, nombre) == 0) {
+			break;
+		}
+		for (j = 0; j < 8; j++) {
+			if (strcasecmp(structDisco.part[i].exten[j].name, name) == 0) {
+				esLogica = 1;
+				break;
+			}
+			if (esLogica == 1) {
+				break;
+			}
+		}
+	}
+	if (i == 4 && esLogica == 0) {
+		printf("ERROR: No existe el nombre indicado.\n");
+		return 0;
+	}
+	superbloque sb = crearBloque();
+	char ajuste;
+	int posicion;
+	if (esLogica == 1) {
+		posicion = structDisco.part[i].exten[j].start;
+		ajuste = structDisco.part[i].exten[j].fit;
+		fseek(archivo, structDisco.part[i].exten[j].start, SEEK_SET);
+		fread(&sb, sizeof(superbloque), 1, archivo);
+	} else {
+		posicion = structDisco.part[i].start;
+		ajuste = structDisco.part[i].fit;
+		fseek(archivo, structDisco.part[i].start, SEEK_SET);
+		fread(&sb, sizeof(superbloque), 1, archivo);
+	}
+
+	if (sb.magic == 201404368) {
+		fseek(archivo, sb.apuntadorAVD, SEEK_SET);
+		avd ap;
+		fread(&ap, sizeof(ap), 1, archivo);
+
+		char crear[100];
+		char verificar[100];
+		char verificar2[100];
+		strcpy(crear, "/home/users.txt");
+		int b, a = 0;
+		for (a = 0; a < 100; a++) {
+			if (crear[a] != '\0') { //Hasta que llegue al final
+				verificar[a] = crear[a];
+				verificar2[a] = crear[a];
+			} else {
+				for (b = a; b >= 0; b--) {
+					if (verificar[b] != '/') {
+						verificar[b] = '\0';
+						verificar2[b] = '\0';
+					} else {
+						verificar[b] = '\0';
+						verificar2[b] = '\0';
+						break;
+					}
+				}
+				break;
+			}
+		}
+		char* ruta2;
+		strcpy(verificar, verificar2);
+		if (verificar[0] == '\0') {
+			ruta2 = strtok(crear, "/");
+		} else {
+			ruta2 = strtok(verificar, "/");
+		}
+		fclose(archivo);
+		int datos;
+		ruta2 = strtok(verificar2, "/");
+		datos = buscarArchivo(ruta, sb, ap, ruta2, ajuste, posicion,
+				sb.apuntadorAVD);
+
+		if (datos > 0) {
+			ruta2 = strtok(crear, "/");
+			while ((strstr(ruta2, ".") == 0x0 || strstr(ruta2, ".") == ""
+					|| strstr(ruta2, ".") == NULL) && ruta2 != NULL) {
+				ruta2 = strtok(NULL, "/");
+			}
+			if (ruta2 != NULL) {
+				char mensaje[200];
+				//		printf("contenidoArchivo.\n");
+				strcpy(mensaje, contenidoArchivo(" ", datos, sb, ruta, ruta2));
+				printf("* * * * * * * * * * * * * * * * * * * * * *\n%s\n",
+						mensaje);
+
+				//	bitacora(sb.apuntadorJournal, 2, filen, "", sb, ruta);
+			}
+		} else {
+			printf("ERROR: La ruta no existe.\n");
+		}
+	} else {
+		printf("ERROR: La particion no esta formateada.\n");
+	}
+	return 1;
 }
 
 void logout() {
@@ -4790,6 +4990,7 @@ void crearGrupo() {
 				printf("ERROR: Solo el usuario ROOT puede realizar cambios.\n");
 			}
 		} else {
+			printf("bool = %d\n", boolLogin);
 			printf("ERROR: Debe iniciar sesion como usuario ROOT.\n");
 		}
 
@@ -5061,12 +5262,12 @@ char* cambiarEliminado(char* atributos) {
 }
 
 void crearUsuario() {
-	if (id == NULL || usuario == NULL || password == NULL || grupo == NULL) {
+	if (id == NULL || name == NULL || password == NULL || grupo == NULL) {
 		printf("ERROR: Falta un atributo obligatorio.\n");
 	} else {
 		if (boolLogin == 1) {
 			if (strcasecmp(usrLogin, "root") == 0) {
-				int d = crearUsuarioDisco(id, usuario, password, grupo);
+				int d = crearUsuarioDisco(id, name, password, grupo);
 				if (d == 0) {
 					printf(
 							"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
@@ -5075,6 +5276,7 @@ void crearUsuario() {
 				printf("ERROR: Solo el usuario ROOT puede realizar cambios.\n");
 			}
 		} else {
+			printf("bool = %d\n", boolLogin);
 			printf("ERROR: Debe iniciar sesion como usuario ROOT.\n");
 		}
 	}
@@ -5440,7 +5642,7 @@ int obtenerArchivoUsers(char* id) {
 	int j = 0;
 	int esLogica = 0;
 	for (i = 0; i < 4; i++) {
-		printf("N:: %s - %s\n", structDisco.part[i].name, nombre);
+		//printf("N:: %s - %s\n", structDisco.part[i].name, nombre);
 		if (strcasecmp(structDisco.part[i].name, nombre) == 0) {
 			break;
 		}
@@ -5525,7 +5727,7 @@ int obtenerArchivoUsers(char* id) {
 			if (ruta2 != NULL) {
 				char mensaje[200];
 				printf("* * * * * *\n");
-				//		printf("contenidoArchivo.\n");
+				//			//		printf("contenidoArchivo.\n");
 				char* con = contenidoArchivo(" ", datos, sb, ruta, ruta2);
 				strcpy(mensaje, con);
 				contenidoUsers = con;
@@ -5830,16 +6032,23 @@ void generarReporte() {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
-		} else if (strcasecmp(name, "journaling") == 0
-				|| strcasecmp(name, "journaling\n") == 0) {
-			int d = reporteJOURNAL(name, path, id);
+		} else if (strcasecmp(name, "bitacora") == 0
+				|| strcasecmp(name, "bitacora\n") == 0) {
+			int d = reporteBITACORA(name, path, id);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
-		} else if (strcasecmp(name, "block") == 0
-				|| strcasecmp(name, "sb\n") == 0) {
-			int d = 0; // = reporteDISK(id, name, path);
+		} else if (strcasecmp(name, "bm_arbdir") == 0
+				|| strcasecmp(name, "bm_arbdir\n") == 0) {
+			int d = reporteBITMAP_ARBOL(name, path, id);
+			if (d == 0) {
+				printf(
+						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+			}
+		} else if (strcasecmp(name, "bm_detdir") == 0
+				|| strcasecmp(name, "bm_detdir\n") == 0) {
+			int d = reporteBITMAP_DETALLE(name, path, id);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
@@ -5852,7 +6061,7 @@ void generarReporte() {
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
 		} else if (strcasecmp(name, "bm_block") == 0
-				|| strcasecmp(name, "bm_sb\n") == 0) {
+				|| strcasecmp(name, "Bm_block\n") == 0) {
 			int d = reporteBITMAP_BLOQUE(name, path, id);
 			if (d == 0) {
 				printf(
@@ -5874,26 +6083,43 @@ void generarReporte() {
 			}
 		} else if (strcasecmp(name, "file") == 0
 				|| strcasecmp(name, "file\n") == 0) {
+			//printf("HOLIWI = %s\n",ruta);
+			if(ruta!=NULL){
+			int d = reporteFILE(name, path, id, ruta);
+			if (d == 0) {
+				printf(
+						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+			}
+			}else{
+				printf("Falta el atributo ruta.\n");
+			}
+		} else if (strcasecmp(name, "tree_file") == 0
+				|| strcasecmp(name, "tree_file\n") == 0) {
 			int d = 0; // = reporteDISK(id, name, path);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
-		} else if (strcasecmp(name, "ls+i") == 0
-				|| strcasecmp(name, "ls+i\n") == 0) {
-			int d = 0; // = reporteDISK(id, name, path);
+		} else if (strcasecmp(name, "tree_directorio") == 0
+				|| strcasecmp(name, "tree_directorio") == 0) {
+			if(ruta!=NULL){
+
+			int d =reporteTREE_DIRECTORIO(id, name, path,ruta);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
-		} else if (strcasecmp(name, "ls+l") == 0
-				|| strcasecmp(name, "ls+l\n") == 0) {
-			int d = 0; // = reporteDISK(id, name, path);
+			}else{
+							printf("Falta el atributo ruta.\n");
+						}
+		}else if (strcasecmp(name, "directorio") == 0
+				|| strcasecmp(name, "directorio") == 0) {
+			int d = reporteDIRECTORIO(id, name, path);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
-		} else {
+		}  else {
 			printf("name = %s\n", name);
 			printf("x\n");
 		}

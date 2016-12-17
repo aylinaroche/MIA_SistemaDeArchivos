@@ -13,7 +13,8 @@
 #include <math.h>
 #include "estructuras.h"
 //#include "acciones.c"
-
+void logg();
+int iniciarSesion(char* usuario, char* password) ;
 superbloque crearBloque();
 int multiploDeOcho(int tam);
 void atributoDisco(char* coman);
@@ -47,7 +48,7 @@ int  verEspacioUsado(char *id,char *path, char* n,int boolH);
 void formatear();
 int  formatearDisco(char* id, char* type, char* add, char* unit, char* fs);
 void login();
-int  loginUsuario(char* usuario, char* password,char* id);
+int  loginUsuario(char* usuario, char* password);
 int  verificarLogin(char* atributos, char* usuario,char* password);
 void logout();
 void crearGrupo();
