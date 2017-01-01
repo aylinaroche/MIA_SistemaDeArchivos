@@ -28,4 +28,11 @@ char* completarDIRECTORIO(char* ruta, char*mensaje,int posicion);
 int reporteTREE_DIRECTORIO(char* id, char* name, char* path, char* ruta) ;
 char* completarTreeD1(char* aux4, char* mensaje, int posicion,char*path) ;
 char* completarTreeD2(char*aux4,char* mensaje,int posicion);
+int reporteINODO(char* id, char* name, char* path);
+char* completarINODO(char* ruta, char* mensaje, int posicion);
+int reporteTREE_FILE(char* id, char* name, char* path, char* ruta);
+char* completarTreeF1(char* ruta, char* mensaje, int posicion, char* path);
+int reporteTREE_F(char* id, char* name, char* path, char* ruta) ;
+char* LlenarReporteFile(char*aux4,char*mensaje,int posicion,char*path1);
+char* LlenarReporteFile2(char*aux4,char*mensaje,int posicion);
 #endif /* REPORTES_H_ */

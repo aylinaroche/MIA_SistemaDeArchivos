@@ -107,6 +107,11 @@ void  editar();
 void  mover();
 int   moverArchivo(char* id, char* path, char* dest, char* iddest);
 
+void loss();
+int systemLoss(char* id);
+void recovery();
+int systemRecovery(char* id);
+
 int  boolExec;
 mount montar[50];
 

@@ -183,7 +183,7 @@ void atributoDisco(char* coman) {
 			}
 			strcpy(token1, direccion);
 			path = token1;
-		}else if (strcasecmp(token1, "-ruta") == 0
+		} else if (strcasecmp(token1, "-ruta") == 0
 				|| strcasecmp(token1, "–ruta") == 0
 				|| strcasecmp(token1, "+ruta") == 0) {
 			token1 = strtok(NULL, ">");
@@ -204,7 +204,7 @@ void atributoDisco(char* coman) {
 			strcpy(token1, direccion);
 			ruta = token1;
 			//printf("token1 = %s",token1);
-		}  else if (strcasecmp(token1, "+tipo") == 0) {
+		} else if (strcasecmp(token1, "+tipo") == 0 ||strcasecmp(token1, "+type") == 0) {
 			token1 = strtok(NULL, ">");
 			type = token1;
 		} else if (strcasecmp(token1, "+fit") == 0) {
@@ -586,7 +586,7 @@ int crearArchivoBinario(char* size, char* path, char* name) {
 
 int multiploDeOcho(int tam) {
 	int i = 0;
-	for (i = 8; i < 105; i = i + 8) {
+	for (i = 8; i < 300; i = i + 8) {
 		if (i == tam) {
 			return 1;
 		}
@@ -6027,7 +6027,7 @@ void generarReporte() {
 			}
 		} else if (strcasecmp(name, "inode") == 0
 				|| strcasecmp(name, "inode\n") == 0) {
-			int d = 0; // = reporteDISK(id, name, path);
+			int d = reporteINODO(id, name, path);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
@@ -6084,42 +6084,47 @@ void generarReporte() {
 		} else if (strcasecmp(name, "file") == 0
 				|| strcasecmp(name, "file\n") == 0) {
 			//printf("HOLIWI = %s\n",ruta);
-			if(ruta!=NULL){
-			int d = reporteFILE(name, path, id, ruta);
-			if (d == 0) {
-				printf(
-						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
-			}
-			}else{
+			if (ruta != NULL) {
+				int d = reporteFILE(name, path, id, ruta);
+				if (d == 0) {
+					printf(
+							"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+				}
+			} else {
 				printf("Falta el atributo ruta.\n");
 			}
 		} else if (strcasecmp(name, "tree_file") == 0
 				|| strcasecmp(name, "tree_file\n") == 0) {
-			int d = 0; // = reporteDISK(id, name, path);
-			if (d == 0) {
-				printf(
-						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+			if (ruta != NULL) {
+
+				int d = reporteTREE_F(id, name, path, ruta);
+				if (d == 0) {
+					printf(
+							"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+				}
+			} else {
+				printf("Falta el atributo ruta.\n");
 			}
 		} else if (strcasecmp(name, "tree_directorio") == 0
 				|| strcasecmp(name, "tree_directorio") == 0) {
-			if(ruta!=NULL){
+			if (ruta != NULL) {
 
-			int d =reporteTREE_DIRECTORIO(id, name, path,ruta);
-			if (d == 0) {
-				printf(
-						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+				int d = reporteTREE_DIRECTORIO(id, name, path, ruta);
+				if (d == 0) {
+					printf(
+							"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+				}
+			} else {
+				printf("Falta el atributo ruta.\n");
 			}
-			}else{
-							printf("Falta el atributo ruta.\n");
-						}
-		}else if (strcasecmp(name, "directorio") == 0
+		} else if (strcasecmp(name, "directorio") == 0
 				|| strcasecmp(name, "directorio") == 0) {
 			int d = reporteDIRECTORIO(id, name, path);
 			if (d == 0) {
 				printf(
 						"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
 			}
-		}  else {
+		} else {
 			printf("name = %s\n", name);
 			printf("x\n");
 		}
@@ -6163,3 +6168,130 @@ superbloque crearBloque() {
 	return sb;
 }
 
+void loss(){
+	if (id == NULL) {
+		printf("ERROR: Falta un atributo obligatorio.\n");
+	} else {
+		int d = systemLoss(id);
+		if (d == 0) {
+			printf(
+					"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+		}
+	}
+}
+
+int systemLoss(char* id){
+	char* ruta;
+	char* nombre;
+	int i = 0;
+	for (i = 0; i < 31; i++) {
+		if (montar[i].vdID != NULL) {
+			//	printf("NOT NULL -> %s-%s-\n",montar[i].vdID,id);
+			if (strcasecmp(montar[i].vdID, id) == 0) {
+				//	 printf("igual\n");
+				if (montar[i].estado == 1) {
+					ruta = montar[i].path; //%%%
+					nombre = montar[i].name;
+					break;
+				}
+			}
+		}
+	}
+	if (i == 31) {
+		printf("ERROR: El ID no existe.\n");
+		return 0;
+	}
+
+	FILE* archivo;
+	archivo = fopen(ruta, "rb+");
+	if (archivo == NULL) {
+		printf("ERROR: No existe el disco.\n");
+		return 0;
+	}
+	mbr structDisco;
+	fseek(archivo, 0, SEEK_SET);
+	fread(&structDisco, sizeof(mbr), 1, archivo);
+
+//VERIFICAR SI EL NOMBRE COINCIDE CON LA PARTICION
+	int j = 0;
+	int existeLogica = 0;
+	for (i = 0; i < 4; i++) { //Primaria/extendida
+		if (strcasecmp(structDisco.part[i].name, nombre) == 0) {
+			break;
+		}
+		for (j = 0; j < 8; j++) { //journalica
+			if (strcasecmp(structDisco.part[i].exten[j].name, nombre) == 0) {
+				existeLogica = 1;
+				break;
+			}
+		}
+		if (existeLogica == 1) {
+			break;
+		}
+	}
+	if (i == 4 && existeLogica == 0) {
+		printf("ERROR: No existe el nombre indicado.\n");
+		return 0;
+	}
+	superbloque sb = crearBloque();
+	char ajuste;
+
+	int posicion;
+	if (existeLogica == 1) {
+		posicion = structDisco.part[i].exten[j].start;
+		ajuste = structDisco.part[i].exten[j].fit;
+		fseek(archivo, structDisco.part[i].exten[j].start, SEEK_SET);
+		fread(&sb, sizeof(superbloque), 1, archivo);
+	} else {
+		posicion = structDisco.part[i].start;
+		ajuste = structDisco.part[i].fit;
+		fseek(archivo, structDisco.part[i].start, SEEK_SET);
+		fread(&sb, sizeof(superbloque), 1, archivo);
+	}
+	printf("M= %d\n", sb.magic);
+	if (sb.magic == 201404368) {
+		fseek(archivo, sb.apuntadorAVD, SEEK_SET);
+		avd ap;
+		fread(&ap, sizeof(ap), 1, archivo);
+
+		char crear[100];
+		char verificar[100];
+		char verificar2[100];
+		strcpy(crear, path);
+
+		int b, a = 0;
+		for (a = 0; a < 100; a++) {
+			if (crear[a] != '\0') {
+				verificar[a] = crear[a];
+				verificar2[a] = crear[a];
+			} else {
+				for (b = a; b >= 0; b--) {
+					if (verificar[b] != '/') {
+						verificar[b] = '\0';
+						verificar2[b] = '\0';
+					} else {
+						verificar[b] = '\0';
+						verificar2[b] = '\0';
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+
+}
+
+void recovery(){
+	if (id == NULL) {
+		printf("ERROR: Falta un atributo obligatorio.\n");
+	} else {
+		int d = systemRecovey(id);
+		if (d == 0) {
+			printf(
+					"Se han encontrado errores en el comando. No se ha podido ejecutar correctamente.\n");
+		}
+	}
+}
+
+int systemRecovey(char* id){
